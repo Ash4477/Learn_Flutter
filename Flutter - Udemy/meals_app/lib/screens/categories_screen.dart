@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import './dummy_data.dart';
-import './category_item.dart';
+import '../dummy_data.dart';
+import '../widgets/category_item.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
@@ -10,9 +10,12 @@ class CategoriesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('DeliMeals'),
+        title: Text(
+          'DeliMeals',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
         foregroundColor: Colors.white,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.pink,
       ),
       body: GridView(
         padding: const EdgeInsets.all(25),
@@ -23,8 +26,8 @@ class CategoriesScreen extends StatelessWidget {
           mainAxisSpacing: 20,
         ),
         children: <Widget>[
-          ...dummyCategories.map((category) {
-            return CategoryItem(category.title, category.color);
+          ...DUMMY_CATEGORIES.map((category) {
+            return CategoryItem(category.id, category.title, category.color);
           })
         ],
       ),
