@@ -47,7 +47,14 @@ class CartItemWidget extends StatelessWidget {
               padding: const EdgeInsets.all(5),
               child: FittedBox(
                 fit: BoxFit.contain,
-                child: CircleAvatar(child: Text('\$$price')),
+                child: CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: Text(
+                      '\$$price',
+                      style: const TextStyle(
+                        fontSize: 10,
+                      ),
+                    )),
               ),
             ),
             title: Text(title),
