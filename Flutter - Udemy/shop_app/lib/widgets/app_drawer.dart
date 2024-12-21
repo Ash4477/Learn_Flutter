@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../screens/orders_screen.dart';
+import '../screens/user_products_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -14,7 +15,6 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Hello Friend!'),
             automaticallyImplyLeading: false,
           ),
-          const Divider(color: Colors.grey),
           ListTile(
             leading: const Icon(Icons.shop),
             title: const Text('Shop'),
@@ -22,12 +22,23 @@ class AppDrawer extends StatelessWidget {
               Navigator.of(context).pushReplacementNamed('/');
             },
           ),
+          const Divider(color: Colors.black26),
           ListTile(
             leading: const Icon(Icons.payment),
             title: const Text('Orders'),
             onTap: () {
               Navigator.of(context).pushReplacementNamed(
                 OrdersScreen.routeName,
+              );
+            },
+          ),
+          const Divider(color: Colors.black26),
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: const Text('Manage Products'),
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed(
+                UserProductsScreen.routeName,
               );
             },
           ),
