@@ -4,13 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'product.dart';
+import '../models/http_exception.dart';
 
 class Products with ChangeNotifier {
-  final url = Uri.https(
-    'flutter-udemy-36113-default-rtdb.asia-southeast1.firebasedatabase.app',
-    '/products.json',
-  );
-
   List<Product> _items = [];
 
   List<Product> get items {
@@ -26,6 +22,10 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
+    final url = Uri.https(
+      'flutter-udemy-36113-default-rtdb.asia-southeast1.firebasedatabase.app',
+      '/products.json',
+    );
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -49,6 +49,10 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
+    final url = Uri.https(
+      'flutter-udemy-36113-default-rtdb.asia-southeast1.firebasedatabase.app',
+      '/products.json',
+    );
     try {
       final response = await http.post(url,
           body: json.encode({
@@ -73,18 +77,49 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
-      _items[prodIndex] = newProduct;
-      notifyListeners();
+      final url = Uri.https(
+        'flutter-udemy-36113-default-rtdb.asia-southeast1.firebasedatabase.app',
+        '/products/$id.json',
+      );
+      try {
+        await http.patch(url,
+            body: json.encode({
+              'title': newProduct.title,
+              'description': newProduct.description,
+              'imageUrl': newProduct.imageUrl,
+              'price': newProduct.price,
+            }));
+        _items[prodIndex] = newProduct;
+        notifyListeners();
+      } catch (error) {
+        rethrow;
+      }
     } else {
       print('...');
     }
   }
 
-  void deleteProduct(String id) {
-    _items.removeWhere((prod) => id == prod.id);
+  Future<void> deleteProduct(String id) async {
+    final url = Uri.https(
+      'flutter-udemy-36113-default-rtdb.asia-southeast1.firebasedatabase.app',
+      '/products/$id.json',
+    );
+    final existingProductIdx = _items.indexWhere((prod) => prod.id == id);
+    Product? existingProduct = _items[existingProductIdx];
+
+    _items.removeAt(existingProductIdx);
     notifyListeners();
+
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      _items.insert(existingProductIdx, existingProduct as Product);
+      notifyListeners();
+      throw HttpException('Could not delete product.');
+    }
+    existingProduct = null;
   }
 }
