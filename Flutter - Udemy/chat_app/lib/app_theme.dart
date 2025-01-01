@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Theme Colors
-  static const _primaryColor = Color(0xFFE91E63); // Pink
-  static const _secondaryColor = Color(0xFF673AB7); // Deep Purple
+  static const _primaryColor = Color(0xFF25D366); // WhatsApp Green
+  static const _secondaryColor = Color(0xFF128C7E); // WhatsApp Dark Green
 
   // Light Theme Color Scheme
   static final lightColorScheme = ColorScheme.light(
     primary: _primaryColor,
-    secondary: _secondaryColor, // replaces accentColor
+    secondary: _secondaryColor,
     error: const Color(0xFFB00020),
     onPrimary: Colors.white,
-    onSecondary: Colors.white, // replaces accentColorBrightness
+    onSecondary: Colors.white,
     onError: Colors.white,
     background: Colors.grey[50]!,
     onBackground: Colors.black,
@@ -57,7 +57,7 @@ class AppTheme {
     useMaterial3: true,
     colorScheme: lightColorScheme,
     primaryColor: _primaryColor,
-    primarySwatch: Colors.pink,
+    primarySwatch: Colors.green, // Change to green for WhatsApp-like feel
     textTheme: _baseTextTheme,
     appBarTheme: AppBarTheme(
       backgroundColor: lightColorScheme.primary,
@@ -70,12 +70,10 @@ class AppTheme {
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(20), // Updated to match your radius
+          borderRadius: BorderRadius.circular(20),
         ),
       ),
     ),
-    // Adding traditional buttonTheme for backward compatibility
     buttonTheme: ButtonThemeData(
       buttonColor: _primaryColor,
       textTheme: ButtonTextTheme.primary,
@@ -103,7 +101,7 @@ class AppTheme {
     useMaterial3: true,
     colorScheme: darkColorScheme,
     primaryColor: _primaryColor,
-    primarySwatch: Colors.pink,
+    primarySwatch: Colors.green,
     textTheme: _baseTextTheme,
     appBarTheme: AppBarTheme(
       backgroundColor: darkColorScheme.primary,

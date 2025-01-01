@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:firebase_storage/firebase_storage.dart';
+// import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,7 +22,7 @@ class _AuthScreenState extends State<AuthScreen> {
     String email,
     String password,
     String username,
-    File userImage,
+    File? userImage,
     bool isLogin,
     BuildContext ctx,
   ) async {
@@ -42,14 +42,15 @@ class _AuthScreenState extends State<AuthScreen> {
           password: password,
         );
 
-        final ref = FirebaseStorage.instance
-            .ref()
-            .child('user_image')
-            .child('${userCred.user!.uid}.jpg');
+        // final ref = FirebaseStorage.instance
+        //     .ref()
+        //     .child('user_image')
+        //     .child('${userCred.user!.uid}.jpg');
 
-        await ref.putFile(userImage).whenComplete(() {}); // ? check this shit
+        // await ref.putFile(userImage).whenComplete(() {}); // ? check this shit
 
-        final url = await ref.getDownloadURL();
+        final url =
+            'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1667809932i/57515859.jpg';
 
         await FirebaseFirestore.instance
             .collection('users')
@@ -86,9 +87,21 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: AuthForm(
-        _submitAuthForm,
-        _isLoading,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Chatter App',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+          AuthForm(
+            _submitAuthForm,
+            _isLoading,
+          ),
+        ],
       ),
     );
   }
