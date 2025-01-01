@@ -1,14 +1,21 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+
+import '../pickers/user_image_picker.dart';
 
 class AuthForm extends StatefulWidget {
   final void Function(
     String email,
     String password,
     String userName,
+    File userImage,
     bool isLogin,
     BuildContext ctx,
   ) submitFn;
-  const AuthForm(this.submitFn, {super.key});
+  final bool isLoading;
+
+  const AuthForm(this.submitFn, this.isLoading, {super.key});
 
   @override
   State<AuthForm> createState() => _AuthFormState();
@@ -20,17 +27,37 @@ class _AuthFormState extends State<AuthForm> {
   String? _userEmail;
   String? _userName;
   String? _userPass;
+  File? _userImage;
+
+  void _pickedImage(File image) {
+    _userImage = image;
+  }
 
   void _trySubmit() {
     final isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
+
+    if (!(_userName == null || _userName!.isEmpty)) {
+      _userName!.trim();
+    }
+
+    if (_userImage == null && !_isLogin) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Pleae upload an image.'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
 
     if (isValid) {
       _formKey.currentState!.save();
       widget.submitFn(
         _userEmail!.trim(),
         _userPass!.trim(),
-        _userName!.trim(),
+        _userName ?? '',
+        _userImage!,
         _isLogin,
         context,
       );
@@ -50,8 +77,12 @@ class _AuthFormState extends State<AuthForm> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  if (!_isLogin) UserImagePicker(_pickedImage),
                   TextFormField(
                     key: const ValueKey('email'),
+                    autocorrect: false,
+                    textCapitalization: TextCapitalization.none,
+                    enableSuggestions: false,
                     keyboardType: TextInputType.emailAddress,
                     decoration:
                         const InputDecoration(labelText: 'Email address'),
@@ -86,6 +117,9 @@ class _AuthFormState extends State<AuthForm> {
                   if (!_isLogin)
                     TextFormField(
                       key: const ValueKey('username'),
+                      autocorrect: true,
+                      textCapitalization: TextCapitalization.words,
+                      enableSuggestions: true,
                       decoration: const InputDecoration(labelText: 'Username'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -119,22 +153,25 @@ class _AuthFormState extends State<AuthForm> {
                     },
                   ),
                   const SizedBox(height: 12),
-                  ElevatedButton(
-                    onPressed: _trySubmit,
-                    child: Text(_isLogin ? 'Login' : 'Sign Up'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _isLogin = !_isLogin;
-                      });
-                    },
-                    child: Text(
-                      _isLogin
-                          ? 'Create new account.'
-                          : 'I already have an account.',
+                  widget.isLoading
+                      ? CircularProgressIndicator()
+                      : ElevatedButton(
+                          onPressed: _trySubmit,
+                          child: Text(_isLogin ? 'Login' : 'Sign Up'),
+                        ),
+                  if (!widget.isLoading)
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isLogin = !_isLogin;
+                        });
+                      },
+                      child: Text(
+                        _isLogin
+                            ? 'Create new account.'
+                            : 'I already have an account.',
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),

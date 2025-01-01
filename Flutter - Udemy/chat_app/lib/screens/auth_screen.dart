@@ -1,6 +1,9 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../widgets/auth/auth_form.dart';
 
@@ -13,17 +16,21 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   final _auth = FirebaseAuth.instance;
+  var _isLoading = false;
 
   Future<void> _submitAuthForm(
     String email,
     String password,
     String username,
+    File userImage,
     bool isLogin,
     BuildContext ctx,
   ) async {
     UserCredential userCred;
-
     try {
+      setState(() {
+        _isLoading = true;
+      });
       if (isLogin) {
         userCred = await _auth.signInWithEmailAndPassword(
           email: email,
@@ -34,8 +41,26 @@ class _AuthScreenState extends State<AuthScreen> {
           email: email,
           password: password,
         );
+
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('user_image')
+            .child('${userCred.user!.uid}.jpg');
+
+        await ref.putFile(userImage).whenComplete(() {}); // ? check this shit
+
+        final url = await ref.getDownloadURL();
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCred.user!.uid)
+            .set({
+          'username': username,
+          'email': email,
+          'image_url': url,
+        });
       }
-    } on PlatformException catch (e) {
+    } on FirebaseAuthException catch (e) {
       var message = 'An error occurred, please check your credentials!';
       if (e.message != null) {
         message = e.message ?? '';
@@ -47,16 +72,24 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
       );
     } catch (e) {
-      print(e);
+      setState(() {
+        _isLoading = false;
+      });
       rethrow;
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: AuthForm(_submitAuthForm),
+      body: AuthForm(
+        _submitAuthForm,
+        _isLoading,
+      ),
     );
   }
 }
