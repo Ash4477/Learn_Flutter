@@ -48,16 +48,19 @@ class _SearchScreenState extends State<SearchScreen> {
     final convoQuery =
         await FirebaseFirestore.instance.collection('conversations').get();
 
+    final convoDocs = convoQuery.docs.where((doc) {
+      return doc['participants'].contains(currentUserId) &&
+          doc['participants'].contains(otherUserId);
+    }).toList();
+
     final convoRef;
-    if (convoQuery.docs.isEmpty) {
+    if (convoDocs.isEmpty) {
       convoRef =
           await FirebaseFirestore.instance.collection('conversations').add({
         'participants': [currentUserId, otherUserId]
       });
     } else {
-      convoRef = convoQuery.docs
-          .where((doc) => doc['participants'].contains(otherUserId))
-          .toList()[0];
+      convoRef = convoDocs[0];
     }
 
     Navigator.of(context).push(
