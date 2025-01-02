@@ -100,26 +100,31 @@ class ConversationsScreen extends StatelessWidget {
                       vertical: 10,
                       horizontal: 5,
                     ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: userData['image_url'] != null
-                            ? NetworkImage(userData['image_url'])
-                            : null,
-                        child: userData['image_url'] == null
-                            ? const Icon(Icons.person)
-                            : null,
-                      ),
-                      title: Text(userData['username'] ?? 'Unknown User'),
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (ctx) => PrivateChatScreen(
-                              userData['username'],
-                              convo.id,
-                            ),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: userData['image_url'] != null
+                                ? NetworkImage(userData['image_url'])
+                                : null,
+                            child: userData['image_url'] == null
+                                ? const Icon(Icons.person)
+                                : null,
                           ),
-                        );
-                      },
+                          title: Text(userData['username'] ?? 'Unknown User'),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (ctx) => PrivateChatScreen(
+                                  userData['username'],
+                                  convo.id,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        Divider(color: Colors.black26),
+                      ],
                     ),
                   );
                 },
