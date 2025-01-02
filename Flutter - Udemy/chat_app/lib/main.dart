@@ -1,4 +1,5 @@
 import 'package:chat_app/app_theme.dart';
+import 'package:chat_app/screens/conversations_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,7 +34,7 @@ class MainApp extends StatelessWidget {
               return SplashScreen();
             }
             if (userSnapshot.hasData) {
-              return ChatScreen();
+              return ConversationsScreen();
             }
             return AuthScreen();
           }),
