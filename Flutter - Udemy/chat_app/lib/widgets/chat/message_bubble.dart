@@ -6,12 +6,14 @@ class MessageBubble extends StatelessWidget {
   final String message;
   final bool isMe;
   final Key key;
+  final String? chatId;
 
   const MessageBubble(
     this.userName,
     this.userImage,
     this.message,
     this.isMe, {
+    this.chatId,
     required this.key,
   });
 

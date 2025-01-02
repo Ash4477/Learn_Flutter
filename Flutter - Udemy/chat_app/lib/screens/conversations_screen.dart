@@ -4,8 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'search_screen.dart';
+
 class ConversationsScreen extends StatelessWidget {
-  const ConversationsScreen({super.key});
+  final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  ConversationsScreen({super.key});
 
   Future<void> _logout(BuildContext context) async {
     try {
@@ -22,6 +25,15 @@ class ConversationsScreen extends StatelessWidget {
         title: const Text('Chats'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () => {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (ctx) => SearchScreen()),
+              )
+            },
+            tooltip: 'general chat',
+          ),
+          IconButton(
             icon: const Icon(Icons.group),
             onPressed: () => {
               Navigator.of(context).push(
@@ -37,28 +49,23 @@ class ConversationsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot>(
+      body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('conversations')
-            .orderBy('createdAt', descending: true)
+            .where(
+              'participants',
+              arrayContains: currentUserId,
+            )
             .snapshots(),
         builder: (ctx, convoSnapshot) {
           if (convoSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-
           if (!convoSnapshot.hasData || convoSnapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No conversations yet!'));
+            return const Center(child: Text("No conversations found!"));
           }
 
-          final currentUserId = FirebaseAuth.instance.currentUser!.uid;
-          final convoDocs = convoSnapshot.data!.docs.where((doc) {
-            return (doc['participants'] as List).contains(currentUserId);
-          }).toList();
-
-          if (convoDocs.isEmpty) {
-            return const Center(child: Text('No conversations yet!'));
-          }
+          final convoDocs = convoSnapshot.data!.docs;
 
           return ListView.builder(
             itemCount: convoDocs.length,
@@ -88,27 +95,32 @@ class ConversationsScreen extends StatelessWidget {
                   final userData =
                       userSnapshot.data!.data() as Map<String, dynamic>;
 
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: userData['image_url'] != null
-                          ? NetworkImage(userData['image_url'])
-                          : null,
-                      child: userData['image_url'] == null
-                          ? const Icon(Icons.person)
-                          : null,
+                  return Container(
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 5,
                     ),
-                    title: Text(userData['username'] ?? 'Unknown User'),
-                    subtitle: Text(convoDocs[idx]['lastMessage']),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (ctx) => PrivateChatScreen(
-                            userData['username'],
-                            convo.id,
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: userData['image_url'] != null
+                            ? NetworkImage(userData['image_url'])
+                            : null,
+                        child: userData['image_url'] == null
+                            ? const Icon(Icons.person)
+                            : null,
+                      ),
+                      title: Text(userData['username'] ?? 'Unknown User'),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) => PrivateChatScreen(
+                              userData['username'],
+                              convo.id,
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   );
                 },
               );

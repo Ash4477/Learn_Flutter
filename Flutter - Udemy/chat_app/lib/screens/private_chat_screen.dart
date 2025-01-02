@@ -1,14 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/chat/new_message.dart';
 import '../widgets/chat/messages.dart';
 
 class PrivateChatScreen extends StatelessWidget {
-  String otherUserName;
-  String chatId;
-  PrivateChatScreen(
+  final String otherUserName;
+  final String chatId;
+  const PrivateChatScreen(
     this.otherUserName,
     this.chatId, {
     super.key,
@@ -48,8 +47,8 @@ class PrivateChatScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Expanded(child: Messages()),
-          NewMessage(),
+          Expanded(child: Messages(chatId: chatId)),
+          NewMessage(chatId: chatId),
         ],
       ),
     );
